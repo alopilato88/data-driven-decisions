@@ -1,0 +1,65 @@
+---
+title: "Reasoning with Uncertainty"
+subtitle: "An introduction to decision-making with data"
+format: revealjs
+editor_options: 
+  chunk_output_type: console
+---
+
+## Decision-Making
+
+
+
+## People Data are Noisy
+
+Human freedom may then rest in the error term.
+
+People are di
+
+## People Data lack Strong Signals
+
+Many difference causes (gosling article)
+
+Bosco et al evidence
+
+## Scenario: Deciding if you need to de-bias your selection system
+
+Minority vs majority group
+
+## Five components of a significance test
+
+1. Assumptions
+2. Null & Alternative Hypotheses 
+3. Test Statistic
+4. P-value
+5. Conclusion
+
+## Significance Test: Assumptions 
+
+They're there. They're often violated -- luckily they're robust
+
+## Signifcance Test: Hypotheses
+
+## The Null Doesn't Need to be Nil
+
+## Significance Test: Test Statistic 
+
+## Sampling Distribution of a Test Statistic
+
+## P-Value
+
+## Calculating a P-Value
+
+## Significance Test: Conclusion
+
+alpha 
+
+## Kinds of Errors 
+
+Decision Errors (Type 1 & Type 2)
+Effect Size Errors (Type-S and Type-M errors)
+
+
+
+
+

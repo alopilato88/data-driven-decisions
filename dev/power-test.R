@@ -1,7 +1,14 @@
-p <- .70
+# Calculate effect sizes
+x <- .6
+z <- (sin(.2/2 + asin(sqrt(x))))^2
+z - x
+2*asin(sqrt(z)) - 2*asin(sqrt(x))
+
+# Simulation
+p <- .03
 q <- 1 - p
-d <- .03
-n1 <- 40
+d <- .01
+n1 <- 13000
 n2 <- 400
 se1 <- sqrt((p*q)/n1)
 a <- d + p
@@ -26,7 +33,7 @@ for(i in 1:sim) {
   y1 <- rbinom(n1, size = 1, prob = p)
   y2 <- rbinom(n2, size = 1, prob = a)
   
-  mod <- glm(c(y1, y2) ~ rep(c(0,1),c(n1, n2)), family = "binomial")
+  # mod <- glm(c(y1, y2) ~ rep(c(0,1),c(n1, n2)), family = "binomial")
   
   p_all <- mean(c(y1, y2))
   se_est <- sqrt((p_all*(1-p_all)) * (1/n1 + 1/n2))
@@ -37,14 +44,11 @@ for(i in 1:sim) {
   z_vec <- c(z_vec, z)
   
   p_vec <- c(p_vec, pnorm(abs(z), lower.tail = F)*2)
-  p_vec_2 <- c(p_vec_2, prop.test(c(sum(y1), sum(y2)), c(n1, n2))$p.value)
+  # p_vec_2 <- c(p_vec_2, prop.test(c(sum(y1), sum(y2)), c(n1, n2))$p.value)
   
 }
 
 
 
 
-x <- .7
-z <- (sin(.09/2 + asin(sqrt(x))))^2
-z - x
-2*asin(sqrt(z)) - 2*asin(sqrt(x))
+
