@@ -317,6 +317,9 @@
       margin-right: 0; 
     }
   </style>
+  <script src="presentation-reasoning-with-uncertainty_files/libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="presentation-reasoning-with-uncertainty_files/libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="presentation-reasoning-with-uncertainty_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -324,32 +327,148 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">Reasoning with Uncertainty</h1>
-  <p class="subtitle">Introduction to decision-making with data</p>
+  <p class="subtitle">An introduction to decision-making with data</p>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="quarto" class="slide level2">
-<h2>Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <a href="https://quarto.org/docs/presentations/" class="uri">https://quarto.org/docs/presentations/</a>.</p>
+<section id="the-decision-making-process" class="slide level2">
+<h2>The Decision-Making Process</h2>
+<p>Every decision involves a <strong>decision maker</strong> who must choose one <strong>action</strong> from a set of alternatives. Ultimately, the <strong>outcome</strong> of the decision maker’s action will depend on the true <strong>state of the world</strong>.</p>
 </section>
-<section id="bullets" class="slide level2">
-<h2>Bullets</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes:</p>
+<section id="youre-the-chro-and-you-have-a-decision-to-make" class="slide level2">
+<h2>You’re the CHRO and You Have a Decision to Make</h2>
+<p>Recently, a competitor of yours was sued because their selection system was unintentionally discriminating against a protected class – disparate impact. As the CHRO, you have to decide whether your selection system needs to be revised to ensure it’s not causing disparate impact.</p>
+<p>What do you do?</p>
+</section>
+<section id="deciding-to-revise-the-selection-system" class="slide level2">
+<h2>Deciding to Revise the Selection System</h2>
+<table>
+<colgroup>
+<col style="width: 28%">
+<col style="width: 36%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Disparate Impact</th>
+<th style="text-align: center;">No Disparate Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Revise System</td>
+<td style="text-align: center;">Social &amp; Ethical Benefit / Less legal exposure</td>
+<td style="text-align: center;">Large expenses / Other opportunity costs</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Keep System</td>
+<td style="text-align: center;">Law suits / Societal Disutility / Hurt org.</td>
+<td style="text-align: center;">Invest in other projects</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-role-of-data-in-decision-making" class="slide level2">
+<h2>The Role of Data in Decision-Making</h2>
+<p><strong>When used appropriately</strong>, data can be used to inform the decision-making process in many different ways:</p>
 <ul>
-<li>Content authored with markdown</li>
-<li>Output from executable code</li>
+<li>Provide information about the most likely state</li>
+<li>Provide information about what actions to take and their impact</li>
+<li>Provide information about the outcomes that resulted from similar actions</li>
 </ul>
 </section>
-<section id="code" class="slide level2">
-<h2>Code</h2>
-<p>When you click the <strong>Render</strong> button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<section id="how-do-we-use-data-appropriately" class="slide level2">
+<h2>How Do We Use Data Appropriately?</h2>
+<p>[Something about uncertainty here?] You will need to wrestle with questions around the significance and strength of an effect:</p>
+<ul>
+<li>Is the hiring rate of the majority group actually different from the hiring rate of the minority group?</li>
+<li>How much larger/smaller is the hiring rate of the majority group compared to that of the minority group?</li>
+</ul>
+</section>
+<section id="significance-of-an-effect" class="slide level2">
+<h2>Significance of an Effect</h2>
+<p>To answer questions about the significance of an effect, statisticians designed a statistical framework called Null Hypothesis Significance Testing (NHST).</p>
+<p>In our example, we want to know if the majority hiring rate (<span class="math inline">\(HR_{maj}\)</span>) is significantly different than the minority hiring rate (<span class="math inline">\(HR_{min}\)</span>).</p>
+</section>
+<section id="components-of-the-nhst-framework" class="slide level2">
+<h2>Components of the NHST Framework</h2>
+<div class="cell" data-reveal="true" data-fig-width="10">
+<div class="cell-output-display">
+<div>
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
+  B(Data) --&gt; C(Test Statistic) --&gt; D(P-Value) --&gt; E(Conclusion)
+  F(Hypotheses) --&gt; C
+  G(Assumptions) --&gt; C
+</pre>
+<div id="mermaid-tooltip-1" class="mermaidTooltip">
+
+</div>
+<p></p>
 </div>
 </div>
+</div>
+</section>
+<section id="statistical-assumptions" class="slide level2">
+<h2>Statistical Assumptions</h2>
+<p>There are more than a few.</p>
+<p>They are often violated.</p>
+<p>Thank the mathematical powers that be that these tests are fairly insensitive to most violations.</p>
+<p>If you want to make a data scientist sweat, ask them if they checked the model assumptions.</p>
+</section>
+<section id="statistical-hypotheses" class="slide level2">
+<h2>Statistical Hypotheses</h2>
+<p>A statistical hypothesis is a precise statement about the effect you are estimating and it should logically connect to the decision being made.</p>
+<ul>
+<li>Null Hypothesis (<span class="math inline">\(H_0\)</span>): A statement that the effect takes a specific value—usually 0.</li>
+<li>Alternative Hypothesis (<span class="math inline">\(H_a\)</span>): A statement that the effect takes on a range of values—usually any value, but 0.</li>
+</ul>
+</section>
+<section id="setting-up-the-null-alternative-hypotheses" class="slide level2">
+<h2>Setting Up the Null &amp; Alternative Hypotheses</h2>
+<p>The effect we are interested in is the difference in hiring rates: <span class="math inline">\(\mathit{p}_{maj} - \mathit{p}_{min}\)</span></p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span>: The majority group hiring rate is equal to the minority group hiring rate or <span class="math inline">\(HR_{maj} - HR_{min}=0\)</span>.</p></li>
+<li><p><span class="math inline">\(H_a\)</span>: The majority group hiring rate does not equal the minority group hiring rate or <span class="math inline">\(HR_{maj} - HR_{min} \neq 0\)</span></p></li>
+</ul>
+</section>
+<section id="understanding-the-test-statistic" class="slide level2">
+<h2>Understanding the Test Statistic</h2>
+</section>
+<section id="sampling-distribution-of-a-test-statistic" class="slide level2">
+<h2>Sampling Distribution of a Test Statistic</h2>
+</section>
+<section id="p-value" class="slide level2">
+<h2>P-Value</h2>
+</section>
+<section id="calculating-a-p-value" class="slide level2">
+<h2>Calculating a P-Value</h2>
+</section>
+<section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
+<p>alpha</p>
+</section>
+<section id="people-data-are-noisy" class="slide level2">
+<h2>People Data are Noisy</h2>
+<p>People are di</p>
+</section>
+<section id="people-data-lack-strong-signals" class="slide level2">
+<h2>People Data lack Strong Signals</h2>
+<p>Many difference causes (gosling article)</p>
+<p>Bosco et al evidence</p>
+</section>
+<section id="kinds-of-statistical-errors" class="slide level2">
+<h2>Kinds of Statistical Errors</h2>
+<p>Statistical Decision Errors (Type 1 &amp; Type 2) Effect Size Errors (Type-S and Type-M errors)</p>
+</section>
+<section id="methods-to-understand-and-mitigate-errors" class="slide level2">
+<h2>Methods to Understand and Mitigate Errors</h2>
+</section>
+<section id="practical-vs-statistical-significance" class="slide level2">
+<h2>Practical vs Statistical Significance</h2>
 <div class="footer footer-default">
 
 </div>
@@ -565,44 +684,6 @@
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        // dispatch for htmlwidgets
-        function fireSlideEnter() {
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-        }
-
-        function fireSlideChanged(previousSlide, currentSlide) {
-          fireSlideEnter();
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

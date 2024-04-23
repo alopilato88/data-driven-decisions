@@ -6,38 +6,93 @@ editor_options:
   chunk_output_type: console
 ---
 
+## The Decision-Making Process 
+
+Every decision involves a **decision maker** who must choose one **action** from a set of alternatives. Ultimately, the **outcome** of the decision maker's action will depend on the true **state of the world**. 
+
+## You're the CHRO and You Have a Decision to Make
+
+Recently, a competitor of yours was sued because their selection system was unintentionally discriminating against a protected class -- disparate impact. As the CHRO, you have to decide whether your selection system needs to be revised to ensure it's not causing disparate impact. 
+
+What do you do?
+
+## Deciding to Revise the Selection System
+
++----------------------+------------------------------------------------+------------------------------------------+
+|                      | Disparate Impact                               | No Disparate Impact                      |
++:====================:+:==============================================:+:========================================:+
+| Revise System        | Social & Ethical Benefit / Less legal exposure | Large expenses / Other opportunity costs |
++----------------------+------------------------------------------------+------------------------------------------+
+| Keep System          | Law suits / Societal Disutility / Hurt org.    | Invest in other projects                 |
++----------------------+------------------------------------------------+------------------------------------------+
+
+: {tbl-colwidths="[28, 36, 36]"}
+
 ## The Role of Data in Decision-Making
 
-## People Data are Noisy
+**When used appropriately**, data can be used to inform the decision-making process in many different ways: 
 
-People are di
+- Provide information about the most likely state
+- Provide information about what actions to take and their impact
+- Provide information about the outcomes that resulted from similar actions
 
-## People Data lack Strong Signals
+## How Do We Use Data Appropriately? 
 
-Many difference causes (gosling article)
+[Something about uncertainty here?] You will need to wrestle with questions around the significance and strength of an effect:
 
-Bosco et al evidence
+- Is the hiring rate of the majority group actually different from the hiring rate of the minority group?
+- How much larger/smaller is the hiring rate of the majority group compared to that of the minority group? 
 
-## Updating an Organization's Selection System 
+## Significance of an Effect
 
-Decision matrix AI Yes/No Update Selection Yes/No
+To answer questions about the significance of an effect, statisticians designed a statistical framework called Null Hypothesis Significance Testing (NHST). 
 
-## Five components of a significance test
+In our example, we want to know if the majority hiring rate ($\mathit{p}_{maj}$) is significantly different than the minority hiring rate ($\mathit{p}_{min}$).
 
-1. Assumptions
-2. Null & Alternative Hypotheses 
-3. Test Statistic
-4. P-value
-5. Conclusion
+## Components of the NHST Framework
 
-## Assumptions
+```{mermaid}
+%%| fig-width: 10
+flowchart LR
+  B(Data) --> C(Test Statistic) --> D(P-Value) --> E(Conclusion)
+  F(Hypotheses) --> C
+  G(Assumptions) --> C
+```
 
-They're there. They're often violated -- luckily they're robust
+## Statistical Assumptions
 
-## The Null & Alternative Hypotheses 
+There are more than a few. 
+
+They are often violated. 
+
+Thank the mathematical powers that be that these tests are fairly insensitive to most violations. 
+
+If you want to make a data scientist sweat, ask them if they checked the model assumptions. 
+
+## Statistical Hypotheses 
+
+A statistical hypothesis is a precise statement about the effect you are estimating and it should logically connect to the decision being made.
+
+- Null Hypothesis ($H_0$): A statement that the effect takes a specific value---usually 0.
+- Alternative Hypothesis ($H_a$): A statement that the effect takes on a range of values---usually any value, but 0.
+
+## Setting Up the Null & Alternative Hypotheses 
+
+The effect we are interested in is the difference in hiring rates: $\mathit{p}_{maj} - \mathit{p}_{min}$
+
+- $H_0$: The majority group hiring rate is equal to the minority group hiring rate or $\mathit{p}_{maj} - \mathit{p}_{min}=0$.
+
+- $H_a$: The majority group hiring rate does not equal the minority group hiring rate or $\mathit{p}_{maj} - \mathit{p}_{min} \neq 0$
 
 
-## Understanding the Test Statistic 
+## Understanding the Test Statistic : Sampling Distribution
+
+```{r}
+#| label: sampling-distribution
+```
+
+
+
 
 ## Sampling Distribution of a Test Statistic
 
@@ -49,18 +104,24 @@ They're there. They're often violated -- luckily they're robust
 
 alpha 
 
-## Kinds of Errors 
+## People Data are Noisy
 
-Decision Errors (Type 1 & Type 2)
+People are di
+
+## People Data lack Strong Signals
+
+Many difference causes (gosling article)
+
+Bosco et al evidence
+
+## Kinds of Statistical Errors 
+
+Statistical Decision Errors (Type 1 & Type 2)
 Effect Size Errors (Type-S and Type-M errors)
 
-## Decision Errors 
+## Methods to Understand and Mitigate Errors
 
-Matrix
-
-## Effect Size Errors
-
-
+## Practical vs Statistical Significance
 
 
 
