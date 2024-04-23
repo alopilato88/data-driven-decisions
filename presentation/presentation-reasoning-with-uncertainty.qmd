@@ -6,13 +6,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-## Decision-Making
-
-
+## The Role of Data in Decision-Making
 
 ## People Data are Noisy
-
-Human freedom may then rest in the error term.
 
 People are di
 
@@ -22,9 +18,9 @@ Many difference causes (gosling article)
 
 Bosco et al evidence
 
-## Scenario: Deciding if you need to de-bias your selection system
+## Updating an Organization's Selection System 
 
-Minority vs majority group
+Decision matrix AI Yes/No Update Selection Yes/No
 
 ## Five components of a significance test
 
@@ -34,15 +30,14 @@ Minority vs majority group
 4. P-value
 5. Conclusion
 
-## Significance Test: Assumptions 
+## Assumptions
 
 They're there. They're often violated -- luckily they're robust
 
-## Signifcance Test: Hypotheses
+## The Null & Alternative Hypotheses 
 
-## The Null Doesn't Need to be Nil
 
-## Significance Test: Test Statistic 
+## Understanding the Test Statistic 
 
 ## Sampling Distribution of a Test Statistic
 
@@ -50,7 +45,7 @@ They're there. They're often violated -- luckily they're robust
 
 ## Calculating a P-Value
 
-## Significance Test: Conclusion
+## Conclusion
 
 alpha 
 
@@ -58,6 +53,12 @@ alpha
 
 Decision Errors (Type 1 & Type 2)
 Effect Size Errors (Type-S and Type-M errors)
+
+## Decision Errors 
+
+Matrix
+
+## Effect Size Errors
 
 
 

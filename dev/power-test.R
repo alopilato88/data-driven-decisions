@@ -4,12 +4,14 @@ z <- (sin(.2/2 + asin(sqrt(x))))^2
 z - x
 2*asin(sqrt(z)) - 2*asin(sqrt(x))
 
+.3*.8
+
 # Simulation
-p <- .03
+p <- .24
 q <- 1 - p
-d <- .01
-n1 <- 13000
-n2 <- 400
+d <- .04
+n1 <- 100
+n2 <- 5000
 se1 <- sqrt((p*q)/n1)
 a <- d + p
 se2 <- sqrt((a*(1-a))/n2)
@@ -40,7 +42,7 @@ for(i in 1:sim) {
   
   z <- (mean(y2) - mean(y1)) / se_est
   
-  dif_vec <- c(dif_vec, mean(y2) - mean(y1))
+  dif_vec <- c(dif_vec, mean(y1)/mean(y2))
   z_vec <- c(z_vec, z)
   
   p_vec <- c(p_vec, pnorm(abs(z), lower.tail = F)*2)
