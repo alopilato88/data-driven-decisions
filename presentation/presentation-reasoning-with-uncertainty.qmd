@@ -129,7 +129,7 @@ $$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.}
 
 ## P-Value
 
-$$\text{P-Value} =P(\lvert Z \rvert \space | H_0 = True)\times2$$
+The p-value is the probability of observing a test statistic as extreme or more---in either direction---than your test statistic given that the null hypothesis is true. 
 
 ```{r}
 #| label: null-samp-dist
@@ -177,15 +177,71 @@ ggplot2::ggplot(
   
 ```
 
-## Conclusion
+## Getting Comfortable with the P-Value
 
-alpha 
+To calculate a p-value, you must be comfortable makeing the following assumptions:
+
+1. The Null Distribution is true (weird, right?)
+2. The sampling distribution of the test statistic is normal with a mean equal to the value specified by your null hypothesis and a standard deviation equal to the standard error under the null hypothesis
+
+## Conclusion: Should I Reject my Null Hypothesis? 
+
+You can think of the p-value as providing **evidence against the null hypothesis.** The smaller the p-value, the more evidence we have that the null hypothesis is not actually true. 
+
+But how much evidence do we need? 
+
+## Enter Alpha---the Significance Level
+
+Generally, the person analyzing the data has either explicitly stated or implicitly assumed a threshold that if the p-value falls under, then they have sufficient evidence to **reject the null hypothesis.**
+
+The value of this threshold is called $\alpha$ and it is usually set at .05. 
+
+```{r}
+#| label: alpha-plot
+
+ggplot2::ggplot(
+  data = NULL,
+  ggplot2::aes(
+    x = c(qnorm(.001, mean = 0, sd = 1), qnorm(.999, mean = 0, sd = 1))
+  )
+) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    fill = "red",
+    xlim = c(qnorm(.001, mean = 0, sd = 1), qnorm(.025))
+  ) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    fill = "blue",
+    xlim = c(qnorm(.025), qnorm(.975))
+  ) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    fill = "red",
+    xlim = c(qnorm(.975), qnorm(.999, mean = 0, sd = 1))
+  )
+  
+```
 
 ## Does the NHST Framework Work? 
 
-Not for data measured with error, with small effects and small sample sizes---people data
+An article titled: *"Abandon statistical significance"* has been cited 1,004 times since it was published in 2019---which is a lot. 
 
-With people data (and similar types), we can expect to make some statistical errors.
+## When Does the NHST Framework Fall Apart? 
+
+When the data you are working with can be charactereized as: 
+
+- Noisy: A lot of measurement error
+- Quiet: Small effect sizes 
+- Small: The number of observations (per group) is "small"
+
+What does this mean about people data? 
 
 ## Kinds of Statistical Errors 
 

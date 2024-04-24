@@ -422,7 +422,7 @@
 </section>
 <section id="statistical-hypotheses" class="slide level2">
 <h2>Statistical Hypotheses</h2>
-<p>A statistical hypothesis is a precise statement about the effect you are estimating and it should logically connect to the decision being made.</p>
+<p>A statistical hypothesis is a precise statement about the population effect you are estimating that should logically connect to the decision being made.</p>
 <ul>
 <li>Null Hypothesis (<span class="math inline">\(H_0\)</span>): A statement that the effect takes a specific value—usually 0.</li>
 <li>Alternative Hypothesis (<span class="math inline">\(H_a\)</span>): A statement that the effect takes on a range of values—usually any value, but 0.</li>
@@ -442,31 +442,62 @@
 <img data-src="presentation-reasoning-with-uncertainty_files/figure-revealjs/sampling-distribution-1.png" width="960" class="r-stretch"></section>
 <section id="building-a-test-statistic" class="slide level2">
 <h2>Building a Test Statistic</h2>
-<p><span class="math display">\[Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.} - \overbrace{0}^\text{Null Hyp.}}{\text{SE}_{\text{Null Dist.}}}\]</span></p>
+<p><span class="math display">\[Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.} - \overbrace{0}^\text{Null Hyp.}}{\text{SE of Null Dist.}}\]</span></p>
 </section>
 <section id="p-value" class="slide level2">
 <h2>P-Value</h2>
+<p>The p-value is the probability of observing a test statistic as extreme or more—in either direction—than your test statistic given that the null hypothesis is true.</p>
 
 <img data-src="presentation-reasoning-with-uncertainty_files/figure-revealjs/null-samp-dist-1.png" width="960" class="r-stretch"></section>
-<section id="conclusion" class="slide level2">
-<h2>Conclusion</h2>
-<p>alpha</p>
+<section id="getting-comfortable-with-the-p-value" class="slide level2">
+<h2>Getting Comfortable with the P-Value</h2>
+<p>To calculate a p-value, you must be comfortable makeing the following assumptions:</p>
+<ol type="1">
+<li>The Null Distribution is true (weird, right?)</li>
+<li>The sampling distribution of the test statistic is normal with a mean equal to the value specified by your null hypothesis and a standard deviation equal to the standard error under the null hypothesis</li>
+</ol>
 </section>
-<section id="people-data-are-noisy" class="slide level2">
-<h2>People Data are Noisy</h2>
-<p>People are di</p>
+<section id="conclusion-should-i-reject-my-null-hypothesis" class="slide level2">
+<h2>Conclusion: Should I Reject my Null Hypothesis?</h2>
+<p>You can think of the p-value as providing <strong>evidence against the null hypothesis.</strong> The smaller the p-value, the more evidence we have that the null hypothesis is not actually true.</p>
+<p>But how much evidence do we need?</p>
 </section>
-<section id="people-data-lack-strong-signals" class="slide level2">
-<h2>People Data lack Strong Signals</h2>
-<p>Many difference causes (gosling article)</p>
-<p>Bosco et al evidence</p>
+<section id="enter-alphathe-significance-level" class="slide level2">
+<h2>Enter Alpha—the Significance Level</h2>
+<p>Generally, the person analyzing the data has either explicitly stated or implicitly assumed a threshold that if the p-value falls under, then they have sufficient evidence to <strong>reject the null hypothesis.</strong></p>
+<p>The value of this threshold is called <span class="math inline">\(\alpha\)</span> and it is usually set at .05.</p>
+
+<img data-src="presentation-reasoning-with-uncertainty_files/figure-revealjs/alpha-plot-1.png" width="960" class="r-stretch"></section>
+<section id="does-the-nhst-framework-work" class="slide level2">
+<h2>Does the NHST Framework Work?</h2>
+<p>An article titled: <em>“Abandon statistical significance”</em> has been cited 1,004 times since it was published in 2019—which is a lot.</p>
 </section>
 <section id="kinds-of-statistical-errors" class="slide level2">
 <h2>Kinds of Statistical Errors</h2>
 <p>Statistical Decision Errors (Type 1 &amp; Type 2) Effect Size Errors (Type-S and Type-M errors)</p>
 </section>
+<section id="go-to-simulation-code" class="slide level2">
+<h2>Go To Simulation Code</h2>
+</section>
+<section id="impact-on-descision" class="slide level2">
+<h2>Impact on Descision</h2>
+<ul>
+<li>S1: Type 1 Error - Needlesly spend money</li>
+<li>S2: Type 2 Error - A new analysis with larger sample size could find effect and if rates change then AI ratio changes</li>
+<li>S3: Type-S Error - Potential lawsuit</li>
+<li>S4: Type-M Error - Overreaction</li>
+</ul>
+</section>
 <section id="methods-to-understand-and-mitigate-errors" class="slide level2">
 <h2>Methods to Understand and Mitigate Errors</h2>
+<ul>
+<li>Design analysis</li>
+<li>Simulations</li>
+<li>Confidence Intervals</li>
+</ul>
+</section>
+<section id="does-a-large-sample-solve-this" class="slide level2">
+<h2>Does a Large Sample Solve This?</h2>
 </section>
 <section id="practical-vs-statistical-significance" class="slide level2">
 <h2>Practical vs Statistical Significance</h2>
