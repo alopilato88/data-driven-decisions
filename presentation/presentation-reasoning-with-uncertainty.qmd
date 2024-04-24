@@ -51,13 +51,11 @@ In our example, we want to know if the majority hiring rate ($\mathit{p}_{maj}$)
 
 ## Components of the NHST Framework
 
-```{mermaid}
-%%| fig-width: 10
-flowchart LR
-  B(Data) --> C(Test Statistic) --> D(P-Value) --> E(Conclusion)
-  F(Hypotheses) --> C
-  G(Assumptions) --> C
-```
+1. Assumptions
+2. Statistical Hypotheses
+3. Test Statistic 
+4. P-Value
+5. Conclusion/Decision
 
 ## Statistical Assumptions
 
@@ -84,6 +82,9 @@ The effect we are interested in is the difference in hiring rates: $\mathit{p}_{
 
 - $H_a$: The majority group hiring rate does not equal the minority group hiring rate or $\mathit{p}_{maj} - \mathit{p}_{min} \neq 0$
 
+## Building a Test Statistic
+
+$$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.} - \overbrace{0}^\text{Null Hyp.}}{\text{SE of Null Dist.}}$$
 
 ## Sampling Distribution of a Statistic
 
@@ -122,10 +123,6 @@ ggplot2::ggplot(
     color = "red"
   )
 ```
-
-## Building a Test Statistic
-
-$$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.} - \overbrace{0}^\text{Null Hyp.}}{\text{SE of Null Dist.}}$$
 
 ## P-Value
 
@@ -235,37 +232,115 @@ An article titled: *"Abandon statistical significance"* has been cited 1,004 tim
 
 ## When Does the NHST Framework Fall Apart? 
 
-When the data you are working with can be charactereized as: 
+When the data you are working with can be characterized as: 
 
 - Noisy: A lot of measurement error
-- Quiet: Small effect sizes 
+- Weak: Small effect sizes 
 - Small: The number of observations (per group) is "small"
 
 What does this mean about people data? 
 
-## Kinds of Statistical Errors 
+## What Happens when NHST Falls Apart?
 
-Statistical Decision Errors (Type 1 & Type 2)
-Effect Size Errors (Type-S and Type-M errors)
+We start making statistical errors:
 
-## Go To Simulation Code
+- **Statistical Decision Errors**: Type 1 & Type 2 Errors
+- **Effect Size Errors**: Type S & Type M Errors
 
-## Impact on Descision
+## Statistical Decision Errors
 
-* S1: Type 1 Error - Needlesly spend money
-* S2: Type 2 Error - A new analysis with larger sample size could find effect and if rates change then AI ratio changes
-* S3: Type-S Error - Potential lawsuit 
-* S4: Type-M Error - Overreaction 
+Statistical decision errors are made when we choose the wrong action based on our p-value:
 
-## Methods to Understand and Mitigate Errors
++---------------------+--------------+--------------+
+|                     | $H_0$ True   | $H_0$ False  |
++:===================:+:============:+:============:+
+| Reject $H_0$        | Type 1 Error | Correct Dec. |
++---------------------+--------------+--------------+
+| Do Not Reject $H_0$ | Correct Dec. | Type 2 Error |
++---------------------+--------------+--------------+
 
-- Design analysis
-- Simulations
-- Confidence Intervals
+: {tbl-colwidths="[33, 33, 33]"}
 
-## Does a Large Sample Solve This? 
+## Effect Size Errors
 
-## Practical vs Statistical Significance
+Effect size errors are errors that are made when an estimated effect, deemed significant, is **quite** different from the true effect: 
+
+- **Type S (Sign) Error**: The sign of a significant, estimated effect is opposite of the true effect
+- **Type M (Magnitude) Error**: The value of a significant, estimated effect is far from the magnitude of the true effect
+
+## Lets See Some Examples
+
+## When Data Misleads You
+
+How do these statistical errors impact your decision to revise your organization's selection system? 
+
+- Type 1 Error: Spend money on unnecessary updates 
+- Type 2 Error: Continued discrimination / legal exposure
+- Type S Error: Continued discrimination / legal exposure / different interventions
+- Type M Error: Unnecessary sense of alarm which could result in taking the wrong actions
+
+## Methods to Understand Error Rates
+
+Conduct a **design analysis**:
+
+- **Prospective Design Analysis**: Before undertaking your analysis, simulate your data and calculate error rates under a range of different settings
+- **Retrospective Design Analysis**: After undertaking your analysis, simulate similar data using parameters that mirror your study
+
+## Methods to Reduce Error Rates
+
+**Power** is the probability of rejecting $H_0$ when it is false. By increasing the power of your study, you are able to reduce Type 2, Type 2, and Type M error rates. To increase power, you can: 
+
+- Increase your sample size
+- Increase the strength of the effect size
+- Decrease the $\alpha$ level
+
+## Let's Just Get the Biggest Sample Possible
+
+There are a few issues with this: 
+
+- It can be pretty expensive and time consuming
+- If you are comparing groups, then you need to make sure that you increase the individual group sizes
+- With a large enough sample, you can find the tiniest effects to be significant
+
+## Sample Size, Power, & Error Rates 
+
+```{r}
+#| label: power-analysis-plot
+
+data_power <- 
+  tibble::tibble(
+    n_min = seq(1, 2000, by = 10)
+  ) |>
+  tidyr::expand_grid(
+    tibble::tibble(
+      effect = c(.04, .12, .21)
+    )
+  ) |>
+  dplyr::mutate(
+    n_maj = 4000,
+    p_min = .30,
+    p_maj = effect + p_min,
+    p_pool = (p_maj * n_maj + p_min * n_min) / (n_maj + n_min),
+    se_pool = sqrt((p_pool * (1 - p_pool)) * (1/n_maj + 1/n_min)),
+    se_maj = sqrt((p_maj * (1 - p_maj)) / n_maj),
+    se_min = sqrt((p_min * (1 - p_min)) / n_min),
+    se_alt = sqrt(se_maj^2 + se_min^2),
+    power = pnorm(qnorm(.975)*(se_pool / se_alt) - (effect / se_alt), lower.tail = F) + pnorm(-qnorm(.975)*(se_pool / se_alt) - (effect / se_alt)),
+    s_error = pnorm(-qnorm(.975)*(se_pool / se_alt) - (effect / se_alt)) / power
+  )
+
+ggplot2::ggplot(
+  data = data_power, 
+  ggplot2::aes(
+    x = n_min,
+    y = power
+  )
+) + 
+  ggplot2::geom_point() +
+  ggplot2::facet_grid(. ~ effect)
+```
+
+
 
 
 
