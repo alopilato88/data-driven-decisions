@@ -71,7 +71,7 @@ If you want to make a data scientist sweat, ask them if they checked the model a
 
 ## Statistical Hypotheses 
 
-A statistical hypothesis is a precise statement about the effect you are estimating and it should logically connect to the decision being made.
+A statistical hypothesis is a precise statement about the population effect you are estimating that should logically connect to the decision being made.
 
 - Null Hypothesis ($H_0$): A statement that the effect takes a specific value---usually 0.
 - Alternative Hypothesis ($H_a$): A statement that the effect takes on a range of values---usually any value, but 0.
@@ -85,41 +85,129 @@ The effect we are interested in is the difference in hiring rates: $\mathit{p}_{
 - $H_a$: The majority group hiring rate does not equal the minority group hiring rate or $\mathit{p}_{maj} - \mathit{p}_{min} \neq 0$
 
 
-## Understanding the Test Statistic : Sampling Distribution
+## Sampling Distribution of a Statistic
 
 ```{r}
 #| label: sampling-distribution
+
+set.seed(432)
+p <- .7
+q <- 1-p
+se <- sqrt(p*q/500)
+samp_dist <- 
+  tibble::tibble(
+    x = rnorm(1000, mean = p, sd = se)
+    )
+
+ggplot2::ggplot(
+  data = samp_dist,
+  ggplot2::aes(
+    x = x
+  )
+) +
+  ggplot2::geom_histogram(
+    ggplot2::aes(y = ggplot2::after_stat(density)),
+    bins = 25,
+    color = "black"
+  ) + 
+  ggplot2::geom_function(
+    fun = dnorm,
+    args = list(mean = p, sd = se)
+  ) + 
+  ggplot2::geom_segment(
+    x = p,
+    xend = p,
+    y = 0,
+    yend = dnorm(p, mean = p, sd = se),
+    color = "red"
+  )
 ```
 
+## Building a Test Statistic
 
-
-
-## Sampling Distribution of a Test Statistic
+$$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.} - \overbrace{0}^\text{Null Hyp.}}{\text{SE of Null Dist.}}$$
 
 ## P-Value
 
-## Calculating a P-Value
+$$\text{P-Value} =P(\lvert Z \rvert \space | H_0 = True)\times2$$
+
+```{r}
+#| label: null-samp-dist
+
+p_mean <- 0
+p1 <- .30
+p2 <- .40
+n1 <- 200
+n2 <- 200
+p_pool <- (p1*n1 + p2*n2) / (n1 + n2)
+q_pool <- 1 - p_pool
+p_var <- p_pool * q_pool
+p_se <- sqrt(p_var * (1/n1 + 1/n2))
+z_u <- qnorm(.90, mean = 0, sd = 1)
+z_l <- -qnorm(.90, mean = 0, sd = 1)
+
+
+ggplot2::ggplot(
+  data = NULL,
+  ggplot2::aes(
+    x = c(qnorm(.001, mean = 0, sd = 1), qnorm(.999, mean = 0, sd = 1))
+  )
+) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    fill = "red",
+    xlim = c(qnorm(.001, mean = 0, sd = 1), z_l)
+  ) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    fill = "blue",
+    xlim = c(z_l, z_u)
+  ) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    fill = "red",
+    xlim = c(z_u, qnorm(.999, mean = 0, sd = 1))
+  )
+  
+```
 
 ## Conclusion
 
 alpha 
 
-## People Data are Noisy
+## Does the NHST Framework Work? 
 
-People are di
+Not for data measured with error, with small effects and small sample sizes---people data
 
-## People Data lack Strong Signals
-
-Many difference causes (gosling article)
-
-Bosco et al evidence
+With people data (and similar types), we can expect to make some statistical errors.
 
 ## Kinds of Statistical Errors 
 
 Statistical Decision Errors (Type 1 & Type 2)
 Effect Size Errors (Type-S and Type-M errors)
 
+## Go To Simulation Code
+
+## Impact on Descision
+
+* S1: Type 1 Error - Needlesly spend money
+* S2: Type 2 Error - A new analysis with larger sample size could find effect and if rates change then AI ratio changes
+* S3: Type-S Error - Potential lawsuit 
+* S4: Type-M Error - Overreaction 
+
 ## Methods to Understand and Mitigate Errors
+
+- Design analysis
+- Simulations
+- Confidence Intervals
+
+## Does a Large Sample Solve This? 
 
 ## Practical vs Statistical Significance
 
