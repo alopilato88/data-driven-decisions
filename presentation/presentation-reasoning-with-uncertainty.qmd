@@ -9,6 +9,8 @@ editor_options:
  chunk_output_type: console
 ---
 
+## The Decision-Making Process 
+
 ```{r}
 #| label: setup
 #| echo: false
@@ -22,8 +24,6 @@ library(patchwork)
 library(tidyr)
 library(ggtext)
 ```
-
-## The Decision-Making Process 
 
 Every decision involves a **decision maker** who must choose one **action** from a set of alternatives. Each action is associated with a set of possible **outcomes** that depend on the true **state of the world**. 
 
@@ -62,7 +62,7 @@ As the CHRO, you have to **decide** whether your selection system needs to be re
 
 ## How Do We Use Data Appropriately? 
 
-Data are full of uncertainty. To answer any of your questions, you will need to wrestle with questions around significance and strength of effects:
+Data are full of uncertainty. To answer any of your questions, you will need to wrestle with questions around the significance and strength of effects:
 
 - Is the hiring rate of the majority group **significantly** different from the hiring rate of the minority group?
 - How much **larger/smaller** is the hiring rate of the majority group compared to that of the minority group? 
@@ -92,12 +92,14 @@ A few things about statistical assumptions:
 3. Thank the mathematical powers that be that they are fairly insensitive to most violations. 
 4. If you want to make a data scientist sweat, ask them if they checked the model assumptions. 
 
-## Statistical Hypotheses 
+## Statistical Hypotheses: Assuming the Null Just to Prove it False 
 
-A statistical hypothesis is a precise statement about the population effect you are estimating that should logically connect to the decision being made.
+A statistical hypothesis is a statement about the population effect you are estimating that should logically connect to the decision being made.
 
 - Null Hypothesis ($H_0$): A statement that the effect takes a specific value---usually 0.
 - Alternative Hypothesis ($H_a$): A statement that the effect takes on a range of values---usually any value, but 0.
+
+Under NHST, we only test the null hypothesis! 
 
 ## Setting Up the Null & Alternative Hypotheses 
 
@@ -116,7 +118,7 @@ $$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Est. Effect}
 
 ## The Null Sampling Distribution
 
-Because the test statistic is created by standarizing the estimated effect using the mean and standard error specified by the null hypothesis, we can use the standard normal distribution for the sampling distribution. 
+Because the test statistic is created by standardizing the estimated effect using the mean and standard error specified by the null hypothesis, we can use the standard normal distribution for the sampling distribution. 
 
 ```{r}
 #| label: null-sampling-distribution
@@ -190,7 +192,7 @@ ggplot2::ggplot(
   )
 ```
 
-## P-Value: Pretty Misleading
+## P-Value: Pretty Confusing
 
 The p-value is the probability of observing a test statistic as extreme or more, in either direction, than your test statistic **given that the null hypothesis is true**. We use the p-value to provide evidence against the thing we are assuming is true...
 
@@ -269,7 +271,14 @@ ggplot2::ggplot(
     curvature = .3, linewidth = 1, arrow = arrow(length = unit(3, "mm"))
   ) +
   ggplot2::annotate(geom = "text", x = -2.5, y = dnorm(1.75), label = "3.5% of area below -1.80", hjust = "center",
-                    fontface = "bold")
+                    fontface = "bold") + 
+  ggtext::geom_richtext(
+    ggplot2::aes(
+      x = 0,
+      y = dnorm(0)/2,
+      label = "P-Value = .07 <br> .035 + .035"
+    )
+  )
   
 ```
 
@@ -425,7 +434,16 @@ Effect size errors are errors that are made when an estimated effect, deemed sig
 - **Type S (Sign) Error**: The sign of a significant, estimated effect is opposite of the true effect
 - **Type M (Magnitude) Error**: The value of a significant, estimated effect is far from the magnitude of the true effect
 
-## Lets See Some Examples
+## Lets See a Simulated Example!
+
+Some quick simulation parameters to keep in mind: 
+
+- **True difference in hiring rates**: .04
+- **Hiring Rate of Majority Group**: .34
+- **Hiring Rate of Minority Group**: .30
+- **Impact Ratio**: .30 / .34 = .88
+- **Majority Group Size**: 5000
+- **Minority Group Size**: 200
 
 ## When Data Misleads You
 
@@ -450,25 +468,22 @@ Conduct a **design analysis**:
 To increase power, you can: 
 
 - Increase your sample size
-- Increase the strength of the effect size
+- Increase the strength of the effect size 
 - Decrease the $\alpha$ level
-
-## Let's Just Get the Biggest Sample Possible
-
-There are a few issues with this: 
-
-- It can be pretty expensive and time consuming
-- If you are comparing groups, then you need to make sure that you increase the individual group sizes
-- With a large enough sample, you can find significance in the tiniest effects
 
 ## Sample Size, Power, & Error Rates 
 
 ```{r}
 #| label: power-analysis-plot
+#| fig-align: center
+#| fig-width: 15
+#| fig-height: 10
+
+set.seed(404)
 
 data_power <- 
   tibble::tibble(
-    n_min = seq(1, 5000, len = 100)
+    n_min = seq(1, 5000, len = 1000)
   ) |>
   tidyr::expand_grid(
     tibble::tibble(
@@ -498,43 +513,143 @@ for(i in 1:nrow(data_power)) {
 
 power_plot <- 
   ggplot2::ggplot(
-  data = data_power, 
+  data = data_power |>
+    dplyr::mutate(
+      label = dplyr::case_when(
+        effect == .04 ~ ".04 - Small Effect",
+        effect == .12 ~ ".12 - Medium Effect",
+        TRUE ~ ".24 - Large Effect"
+      )
+    ), 
   ggplot2::aes(
     x = n_min,
     y = power
   )
 ) + 
-  ggplot2::geom_line() +
-  ggplot2::facet_grid(. ~ effect)
+  ggplot2::geom_line(
+    linewidth = 1.2,
+    color = "#3F72AF",
+  ) +
+  ggplot2::geom_hline(yintercept = .80, color = "#3F72AF", linetype = "dashed") +
+  ggplot2::scale_x_continuous(
+    breaks = c(seq(0, 5000, by = 500))
+  ) +
+  ggplot2::facet_grid(. ~ label) +
+  ggplot2::scale_y_continuous(
+    breaks = seq(0, 1, by = .10)
+  ) +
+  ggplot2::labs(
+    x = "Minority Group Size",
+    y = "Statistical Power",
+    title = "Statistical Power when Majority Group Size is 5000"
+  ) + 
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none"
+  )
 
 sign_plot <- 
   ggplot2::ggplot(
-  data = data_power, 
+  data = data_power |>
+    dplyr::filter(effect == .04) |>
+    dplyr::group_by(effect, power) |>
+    dplyr::slice_max(s_error), 
   ggplot2::aes(
     x = power,
     y = s_error
   )
 ) + 
-  ggplot2::geom_line() +
-  ggplot2::facet_grid(. ~ effect)
+  ggplot2::geom_line(
+    linewidth = 1.2,
+    color = "#3F72AF",
+  ) +
+  ggplot2::labs(
+    x = "Power",
+    y = "Type S Error Rate",
+    title = "Type S Errors"
+  ) + 
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none"
+  )
 
 magnitude_plot <- 
   ggplot2::ggplot(
-  data = data_power, 
+  data = data_power |>
+    dplyr::filter(effect == .04) |>
+    dplyr::summarize(
+      m_error = mean(m_error),
+      .by = power
+    ), 
   ggplot2::aes(
-    x = n_min,
+    x = power,
     y = m_error
   )
 ) + 
-  ggplot2::geom_line() +
-  ggplot2::facet_grid(. ~ effect) + 
-  ggplot2::ylim(c(0, 5))
+  ggplot2::geom_line(
+    linewidth = 1.2,
+    color = "#3F72AF",
+  ) +
+  ggplot2::scale_y_continuous(
+    breaks = seq(1, 31, by = 5)
+  ) +
+  ggplot2::labs(
+    x = "Power",
+    y = "Exageration Ratio",
+    title = "Type M Error"
+  ) + 
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none"
+  )
 
-power_plot / (sign_plot + magnitude_plot)
+power_patchwork <- power_plot / (sign_plot | magnitude_plot)
 
+power_theme <- 
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none"
+  )
+
+power_patchwork & power_theme
 ```
 
+## Let the Data Inform Your Decision, Don't Let it Drive It
 
+Decision-makers and those analyzing the data need to recognize that modeling uncertainty is **difficult** and full of **subjective decisions**.
 
+It'd be better if we:
+
+1. Focus on the effect, the uncertainty around it, and always keep in mind prior evidence
+2. Use the tools being developed for causal inference 
+3. Forget about binary statistical decisions---treat the p-value continuously
 
 

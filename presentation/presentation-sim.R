@@ -7,7 +7,7 @@
 
 # Set simulation parameters -----------------------------------------------
 
-set.seed(404) # Set seed for reproducibility
+set.seed(8754) # Set seed for reproducibility
 n_sim <- 10000 # Set number of simulation runs
 
 d <- .04 # True effect
@@ -59,9 +59,36 @@ mean(p_vector >= .05) # Type 2 Error Rate at alpha = .05
 
 mean(effect_vector < 0 & p_vector < .05) / mean(p_vector < .05) # Type S Error Rate at alpha = .05
 
+ggplot2::ggplot(
+  data = tibble(effect = effect_vector, 
+                p = p_vector, 
+                sig = dplyr::if_else(p < .05, TRUE, FALSE), 
+                n = 1:length(effect_vector)),
+  ggplot2::aes(
+    x = n,
+    y = effect,
+    color = sig
+  )
+) + 
+  ggplot2::geom_point()
+
 # Type M Errors
 mean(abs(effect_vector[p_vector < .05]))
-(mean(abs(effect_vector[p_vector < .05])) - d) / d
+(mean(abs(effect_vector[p_vector < .05]))) / d
+
+ggplot2::ggplot(
+  data = tibble(effect = effect_vector,
+                p = p_vector,
+                sig = dplyr::if_else(p < .05, TRUE, FALSE)
+  ),
+  ggplot2::aes(
+    x = effect,
+    fill = sig
+  )
+) + 
+  ggplot2::geom_histogram(
+    color = "black"
+  )
 
 mean(impact_ratio_vector[p_vector < .05])
 (mean(impact_ratio_vector[p_vector < .05]) - impact_ratio) / impact_ratio
