@@ -1,20 +1,37 @@
 ---
 title: "Reasoning with Uncertainty"
-subtitle: "An introduction to decision-making with data"
-format: revealjs
+subtitle: "An Introduction to Decision-Making with Data"
+format: 
+  revealjs:
+   theme: [default, presentation-theme.scss]
+   slide-number: true
 editor_options: 
-  chunk_output_type: console
+ chunk_output_type: console
 ---
+
+```{r}
+#| label: setup
+#| echo: false
+#| warning: false
+#| output: false
+
+library(ggplot2)
+library(dplyr)
+library(tibble)
+library(patchwork)
+library(tidyr)
+library(ggtext)
+```
 
 ## The Decision-Making Process 
 
-Every decision involves a **decision maker** who must choose one **action** from a set of alternatives. Ultimately, the **outcome** of the decision maker's action will depend on the true **state of the world**. 
+Every decision involves a **decision maker** who must choose one **action** from a set of alternatives. Each action is associated with a set of possible **outcomes** that depend on the true **state of the world**. 
 
-## You're the CHRO and You Have a Decision to Make
+## You're the CHRO. What do you do?
 
-Recently, a competitor of yours was sued because their selection system was unintentionally discriminating against a protected class -- disparate impact. As the CHRO, you have to decide whether your selection system needs to be revised to ensure it's not causing disparate impact. 
+A competitor of yours was recently sued because their selection system was found to be unintentionally discriminating against a protected class---disparate impact. 
 
-What do you do?
+As the CHRO, you have to **decide** whether your selection system needs to be revised to ensure it's not causing disparate impact.
 
 ## Deciding to Revise the Selection System
 
@@ -28,6 +45,13 @@ What do you do?
 
 : {tbl-colwidths="[28, 36, 36]"}
 
+## Questions You'd Likely Have
+
+- What are the chances our selection system is causing disparate impact? [**State Question**]
+- Our only choices are to fully revise the selection system or not? [**Action Question**]
+- What are the chances our choices will actually result in a beneficial outcome? [**Outcome Question**]
+- **Do we have any data to help us!?**
+
 ## The Role of Data in Decision-Making
 
 **When used appropriately**, data can be used to inform the decision-making process in many different ways: 
@@ -38,18 +62,20 @@ What do you do?
 
 ## How Do We Use Data Appropriately? 
 
-[Something about uncertainty here?] You will need to wrestle with questions around the significance and strength of an effect:
+Data are full of uncertainty. To answer any of your questions, you will need to wrestle with questions around significance and strength of effects:
 
-- Is the hiring rate of the majority group actually different from the hiring rate of the minority group?
-- How much larger/smaller is the hiring rate of the majority group compared to that of the minority group? 
+- Is the hiring rate of the majority group **significantly** different from the hiring rate of the minority group?
+- How much **larger/smaller** is the hiring rate of the majority group compared to that of the minority group? 
 
-## Significance of an Effect
+## Answering Questions Around Significance
 
-To answer questions about the significance of an effect, statisticians designed a statistical framework called Null Hypothesis Significance Testing (NHST). 
+To answer questions about the significance of an effect, we usually rely on a statistical framework called Null Hypothesis Significance Testing (NHST). 
 
 In our example, we want to know if the majority hiring rate ($\mathit{p}_{maj}$) is significantly different than the minority hiring rate ($\mathit{p}_{min}$).
 
-## Components of the NHST Framework
+## Breaking Down the NHST Framework
+
+The NHST can be separated into five different components:
 
 1. Assumptions
 2. Statistical Hypotheses
@@ -57,15 +83,14 @@ In our example, we want to know if the majority hiring rate ($\mathit{p}_{maj}$)
 4. P-Value
 5. Conclusion/Decision
 
-## Statistical Assumptions
+## Assumptions: Rarely Checked, Likely Violated
 
-There are more than a few. 
+A few things about statistical assumptions:
 
-They are often violated. 
-
-Thank the mathematical powers that be that these tests are fairly insensitive to most violations. 
-
-If you want to make a data scientist sweat, ask them if they checked the model assumptions. 
+1. There are more than a few. 
+2. They are likely violated. 
+3. Thank the mathematical powers that be that they are fairly insensitive to most violations. 
+4. If you want to make a data scientist sweat, ask them if they checked the model assumptions. 
 
 ## Statistical Hypotheses 
 
@@ -84,65 +109,18 @@ The effect we are interested in is the difference in hiring rates: $\mathit{p}_{
 
 ## Building a Test Statistic
 
-$$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Effect Est.} - \overbrace{0}^\text{Null Hyp.}}{\text{SE of Null Dist.}}$$
+With our null hypothesis specified, we can now use the data to build our test statistic, $Z$. $Z$ tells us how many standard deviations our estimated effect falls from the mean of the null sampling distribution, which is specified by the null hypothesis. 
 
-## Sampling Distribution of a Statistic
 
-```{r}
-#| label: sampling-distribution
+$$Z = \frac{\overbrace{(\mathit{p_{maj}} - \mathit{p_{min}})}^\text{Est. Effect} - \overbrace{0}^\text{Null Hyp.}}{\text{SE of Null Dist.}}$$
 
-set.seed(432)
-p <- .7
-q <- 1-p
-se <- sqrt(p*q/500)
-samp_dist <- 
-  tibble::tibble(
-    x = rnorm(1000, mean = p, sd = se)
-    )
+## The Null Sampling Distribution
 
-ggplot2::ggplot(
-  data = samp_dist,
-  ggplot2::aes(
-    x = x
-  )
-) +
-  ggplot2::geom_histogram(
-    ggplot2::aes(y = ggplot2::after_stat(density)),
-    bins = 25,
-    color = "black"
-  ) + 
-  ggplot2::geom_function(
-    fun = dnorm,
-    args = list(mean = p, sd = se)
-  ) + 
-  ggplot2::geom_segment(
-    x = p,
-    xend = p,
-    y = 0,
-    yend = dnorm(p, mean = p, sd = se),
-    color = "red"
-  )
-```
-
-## P-Value
-
-The p-value is the probability of observing a test statistic as extreme or more---in either direction---than your test statistic given that the null hypothesis is true. 
+Because the test statistic is created by standarizing the estimated effect using the mean and standard error specified by the null hypothesis, we can use the standard normal distribution for the sampling distribution. 
 
 ```{r}
-#| label: null-samp-dist
-
-p_mean <- 0
-p1 <- .30
-p2 <- .40
-n1 <- 200
-n2 <- 200
-p_pool <- (p1*n1 + p2*n2) / (n1 + n2)
-q_pool <- 1 - p_pool
-p_var <- p_pool * q_pool
-p_se <- sqrt(p_var * (1/n1 + 1/n2))
-z_u <- qnorm(.90, mean = 0, sd = 1)
-z_l <- -qnorm(.90, mean = 0, sd = 1)
-
+#| label: null-sampling-distribution
+#| fig-align: center
 
 ggplot2::ggplot(
   data = NULL,
@@ -154,47 +132,169 @@ ggplot2::ggplot(
     stat = "function",
     fun = dnorm,
     args = list(mean = 0, sd = 1),
-    fill = "red",
-    xlim = c(qnorm(.001, mean = 0, sd = 1), z_l)
+    color = "#112D4E",
+    fill = "#3F72AF",
+    xlim = c(qnorm(.001, mean = 0, sd = 1), qnorm(.999, mean = 0, sd = 1))
+  ) +
+  ggplot2::geom_segment(
+    ggplot2::aes(
+      x = 0,
+      xend = 0,
+      y = 0,
+      yend = dnorm(0)
+    ),
+    size = 1.25
   ) + 
-  ggplot2::geom_area(
-    stat = "function",
-    fun = dnorm,
-    args = list(mean = 0, sd = 1),
-    fill = "blue",
-    xlim = c(z_l, z_u)
+  ggplot2::geom_segment(
+    ggplot2::aes(
+      x = 1.80,
+      xend = 1.80,
+      y = 0,
+      yend = dnorm(1.80)
+    ),
+    lty = "dotted",
+    size = 1.5
+  ) +
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none",
+    axis.ticks.y = ggplot2::element_blank(),
+    axis.text.y = ggplot2::element_blank()
   ) + 
-  ggplot2::geom_area(
-    stat = "function",
-    fun = dnorm,
-    args = list(mean = 0, sd = 1),
-    fill = "red",
-    xlim = c(z_u, qnorm(.999, mean = 0, sd = 1))
+  ggplot2::scale_x_continuous(
+    breaks = c(-2, 0, 1.80, 2),
+    labels = c(-2, 0, 1.80, 2)
+  ) +
+  ggplot2::annotate(
+    geom = "curve", x = 2.5, y = dnorm(1.80), xend = 1.87, yend = dnorm(2.3), 
+    curvature = -.3, linewidth = 1, arrow = arrow(length = unit(3, "mm"))
+  ) +
+  ggplot2::annotate(geom = "text", x = 2.5, y = dnorm(1.75), label = "Test Stat.", hjust = "center",
+                    fontface = "bold") +
+  ggplot2::annotate(
+    geom = "curve", x = -.70, y = dnorm(1.80), xend = -.07, yend = dnorm(2.3), 
+    curvature = .3, linewidth = 1, arrow = arrow(length = unit(2, "mm"))
+  ) +
+  ggplot2::annotate(geom = "text", x = -.70, y = dnorm(1.75), label = "H0 Value", hjust = "center",
+                    fontface = "bold") +
+  ggplot2::labs(
+    y = "",
+    x = "Test Statistic (Z) Values"
   )
+```
+
+## P-Value: Pretty Misleading
+
+The p-value is the probability of observing a test statistic as extreme or more, in either direction, than your test statistic **given that the null hypothesis is true**. We use the p-value to provide evidence against the thing we are assuming is true...
+
+```{r}
+#| label: p-value-area
+#| fig-align: center
+
+ggplot2::ggplot(
+  data = NULL,
+  ggplot2::aes(
+    x = c(qnorm(.001, mean = 0, sd = 1), qnorm(.999, mean = 0, sd = 1))
+  )
+) + 
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    color = "#112D4E",
+    fill = "#112D4E",
+    xlim = c(qnorm(.001, mean = 0, sd = 1), -1.80)
+  ) +
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    color = "#112D4E",
+    fill = "#3F72AF",
+    xlim = c(-1.80, 1.80)
+  ) +
+  ggplot2::geom_area(
+    stat = "function",
+    fun = dnorm,
+    args = list(mean = 0, sd = 1),
+    color = "#112D4E",
+    fill = "#112D4E",
+    xlim = c(1.80, qnorm(.999))
+  ) +
+  ggplot2::geom_segment(
+    ggplot2::aes(
+      x = 0,
+      xend = 0,
+      y = 0,
+      yend = dnorm(0)
+    ),
+    size = 1.25
+  ) +
+  ggplot2::scale_x_continuous(
+    breaks = c(-2, -1.80, 0, 1.80, 2),
+    labels = c(-2, -1.80, 0, 1.80, 2)
+  ) +
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none",
+    axis.ticks.y = ggplot2::element_blank(),
+    axis.text.y = ggplot2::element_blank()
+  ) +
+  ggplot2::labs(
+    y = "",
+    x = "Test Statistic (Z) Values"
+  ) + 
+  ggplot2::annotate(
+    geom = "curve", x = 2.5, y = dnorm(1.80), xend = 2, yend = dnorm(2.3), 
+    curvature = -.3, linewidth = 1, arrow = arrow(length = unit(3, "mm"))
+  ) +
+  ggplot2::annotate(geom = "text", x = 2.5, y = dnorm(1.75), label = "3.5% of area above 1.80", hjust = "center",
+                    fontface = "bold") +
+  ggplot2::annotate(
+    geom = "curve", x = -2.5, y = dnorm(1.80), xend = -2, yend = dnorm(2.3), 
+    curvature = .3, linewidth = 1, arrow = arrow(length = unit(3, "mm"))
+  ) +
+  ggplot2::annotate(geom = "text", x = -2.5, y = dnorm(1.75), label = "3.5% of area below -1.80", hjust = "center",
+                    fontface = "bold")
   
 ```
 
 ## Getting Comfortable with the P-Value
 
-To calculate a p-value, you must be comfortable makeing the following assumptions:
+To calculate a p-value, you must be comfortable making the following assumptions:
 
-1. The Null Distribution is true (weird, right?)
-2. The sampling distribution of the test statistic is normal with a mean equal to the value specified by your null hypothesis and a standard deviation equal to the standard error under the null hypothesis
+1. The null hypothesis is true (weird, right?)
+2. We can create a sampling distribution using the standard normal distribution
 
 ## Conclusion: Should I Reject my Null Hypothesis? 
 
-You can think of the p-value as providing **evidence against the null hypothesis.** The smaller the p-value, the more evidence we have that the null hypothesis is not actually true. 
+You can think of the p-value as providing **evidence against the null hypothesis.** The smaller the p-value, the more evidence we have that the null hypothesis is not actually true---despite assuming it is true. 
 
 But how much evidence do we need? 
 
 ## Enter Alpha---the Significance Level
 
-Generally, the person analyzing the data has either explicitly stated or implicitly assumed a threshold that if the p-value falls under, then they have sufficient evidence to **reject the null hypothesis.**
+Generally, there is an explicitly stated or implicitly assumed threshold that if the p-value falls under, then we have sufficient evidence to **reject the null hypothesis.**
 
 The value of this threshold is called $\alpha$ and it is usually set at .05. 
 
 ```{r}
 #| label: alpha-plot
+#| fig-align: center
 
 ggplot2::ggplot(
   data = NULL,
@@ -206,29 +306,86 @@ ggplot2::ggplot(
     stat = "function",
     fun = dnorm,
     args = list(mean = 0, sd = 1),
-    fill = "red",
+    color = "#112D4E",
+    fill = "#112D4E",
     xlim = c(qnorm(.001, mean = 0, sd = 1), qnorm(.025))
-  ) + 
+  ) +
   ggplot2::geom_area(
     stat = "function",
     fun = dnorm,
     args = list(mean = 0, sd = 1),
-    fill = "blue",
+    color = "#112D4E",
+    fill = "#3F72AF",
     xlim = c(qnorm(.025), qnorm(.975))
-  ) + 
+  ) +
   ggplot2::geom_area(
     stat = "function",
     fun = dnorm,
     args = list(mean = 0, sd = 1),
-    fill = "red",
-    xlim = c(qnorm(.975), qnorm(.999, mean = 0, sd = 1))
-  )
+    color = "#112D4E",
+    fill = "#112D4E",
+    xlim = c(qnorm(.975), qnorm(.999))
+  ) +
+  ggplot2::geom_segment(
+    ggplot2::aes(
+      x = 0,
+      xend = 0,
+      y = 0,
+      yend = dnorm(0)
+    ),
+    size = 1.25
+  ) +
+  ggplot2::geom_segment(
+    ggplot2::aes(
+      x = 1.80,
+      xend = 1.80,
+      y = 0,
+      yend = dnorm(1.80)
+    ),
+    lty = "dotted",
+    size = 1.5
+  ) +
+  ggplot2::scale_x_continuous(
+    breaks = c(-2, 0, 1.80, 2),
+    labels = c(-2, 0, 1.80, 2)
+  ) +
+  ggplot2::theme(
+    plot.background = element_rect(fill = "#F9F7F7", colour = "#F9F7F7"),
+    panel.background = element_rect(fill = "#F9F7F7"),
+    axis.line.x = element_line(colour = "#3D3C42"),
+    axis.line.y = ggplot2::element_blank(),
+    panel.grid.minor = element_line(colour = "#F9F7F7"),
+    panel.grid.major = element_line(colour = "#F9F7F7"),
+    legend.text = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.position = "none",
+    axis.ticks.y = ggplot2::element_blank(),
+    axis.text.y = ggplot2::element_blank()
+  ) +
+  ggplot2::labs(
+    y = "",
+    x = "Test Statistic (Z) Values"
+  ) + 
+  ggplot2::annotate(
+    geom = "curve", x = 2.6, y = dnorm(1.80), xend = 2.10, yend = dnorm(2.3), 
+    curvature = -.3, linewidth = 1, arrow = arrow(length = unit(3, "mm"))
+  ) +
+  ggplot2::annotate(geom = "text", x = 2.6, y = dnorm(1.75), label = "Rejection Region", hjust = "center",
+                    fontface = "bold") +
+  ggplot2::annotate(
+    geom = "curve", x = -2.60, y = dnorm(1.80), xend = -2.10, yend = dnorm(2.3), 
+    curvature = .3, linewidth = 1, arrow = arrow(length = unit(3, "mm"))
+  ) +
+  ggplot2::annotate(geom = "text", x = -2.6, y = dnorm(1.75), label = "Rejection Region", hjust = "center",
+                    fontface = "bold")
   
 ```
 
 ## Does the NHST Framework Work? 
 
-An article titled: *"Abandon statistical significance"* has been cited 1,004 times since it was published in 2019---which is a lot. 
+An article titled: *"Abandon statistical significance"* has been cited 1,004 times since it was published---in 2019.
+
+For reference, an article of arguably higher quality (😉) published in 2014 by LoPilato, Carter, & Wang has a **staggering** 31 cites...
 
 ## When Does the NHST Framework Fall Apart? 
 
@@ -263,7 +420,7 @@ Statistical decision errors are made when we choose the wrong action based on ou
 
 ## Effect Size Errors
 
-Effect size errors are errors that are made when an estimated effect, deemed significant, is **quite** different from the true effect: 
+Effect size errors are errors that are made when an estimated effect, deemed significant, is **quite different** from the true effect: 
 
 - **Type S (Sign) Error**: The sign of a significant, estimated effect is opposite of the true effect
 - **Type M (Magnitude) Error**: The value of a significant, estimated effect is far from the magnitude of the true effect
@@ -274,10 +431,10 @@ Effect size errors are errors that are made when an estimated effect, deemed sig
 
 How do these statistical errors impact your decision to revise your organization's selection system? 
 
-- Type 1 Error: Spend money on unnecessary updates 
-- Type 2 Error: Continued discrimination / legal exposure
-- Type S Error: Continued discrimination / legal exposure / different interventions
-- Type M Error: Unnecessary sense of alarm which could result in taking the wrong actions
+- **Type 1 Error**: Spend money on unnecessary updates 
+- **Type 2 Error**: Continued discrimination / legal exposure
+- **Type S Error**: False sense of security / Continued discrimination / legal exposure / different interventions
+- **Type M Error**: Unnecessary sense of alarm which could result in taking the wrong actions
 
 ## Methods to Understand Error Rates
 
@@ -288,7 +445,9 @@ Conduct a **design analysis**:
 
 ## Methods to Reduce Error Rates
 
-**Power** is the probability of rejecting $H_0$ when it is false. By increasing the power of your study, you are able to reduce Type 2, Type 2, and Type M error rates. To increase power, you can: 
+**Power** is the probability of rejecting $H_0$ when it is false. By increasing the power of your study, you are able to reduce Type 2, Type S, and Type M error rates. 
+
+To increase power, you can: 
 
 - Increase your sample size
 - Increase the strength of the effect size
@@ -300,7 +459,7 @@ There are a few issues with this:
 
 - It can be pretty expensive and time consuming
 - If you are comparing groups, then you need to make sure that you increase the individual group sizes
-- With a large enough sample, you can find the tiniest effects to be significant
+- With a large enough sample, you can find significance in the tiniest effects
 
 ## Sample Size, Power, & Error Rates 
 
@@ -309,7 +468,7 @@ There are a few issues with this:
 
 data_power <- 
   tibble::tibble(
-    n_min = seq(1, 2000, by = 10)
+    n_min = seq(1, 5000, len = 100)
   ) |>
   tidyr::expand_grid(
     tibble::tibble(
@@ -317,7 +476,7 @@ data_power <-
     )
   ) |>
   dplyr::mutate(
-    n_maj = 4000,
+    n_maj = 5000,
     p_min = .30,
     p_maj = effect + p_min,
     p_pool = (p_maj * n_maj + p_min * n_min) / (n_maj + n_min),
@@ -326,18 +485,53 @@ data_power <-
     se_min = sqrt((p_min * (1 - p_min)) / n_min),
     se_alt = sqrt(se_maj^2 + se_min^2),
     power = pnorm(qnorm(.975)*(se_pool / se_alt) - (effect / se_alt), lower.tail = F) + pnorm(-qnorm(.975)*(se_pool / se_alt) - (effect / se_alt)),
-    s_error = pnorm(-qnorm(.975)*(se_pool / se_alt) - (effect / se_alt)) / power
+    s_error = pnorm(-qnorm(.975)*(se_pool / se_alt) - (effect / se_alt)) / power,
+    m_error = NA_real_
   )
 
-ggplot2::ggplot(
+for(i in 1:nrow(data_power)) {
+  est <- rnorm(5000, mean = data_power$effect[i], sd = data_power$se_alt[i])
+  cut_off <- qnorm(.975, mean = 0, sd = data_power$se_pool[i])
+  exag_ratio <- mean(abs(est)[abs(est) > cut_off]) / data_power$effect[i]
+  data_power$m_error[i] <- round(exag_ratio, 2)
+}
+
+power_plot <- 
+  ggplot2::ggplot(
   data = data_power, 
   ggplot2::aes(
     x = n_min,
     y = power
   )
 ) + 
-  ggplot2::geom_point() +
+  ggplot2::geom_line() +
   ggplot2::facet_grid(. ~ effect)
+
+sign_plot <- 
+  ggplot2::ggplot(
+  data = data_power, 
+  ggplot2::aes(
+    x = power,
+    y = s_error
+  )
+) + 
+  ggplot2::geom_line() +
+  ggplot2::facet_grid(. ~ effect)
+
+magnitude_plot <- 
+  ggplot2::ggplot(
+  data = data_power, 
+  ggplot2::aes(
+    x = n_min,
+    y = m_error
+  )
+) + 
+  ggplot2::geom_line() +
+  ggplot2::facet_grid(. ~ effect) + 
+  ggplot2::ylim(c(0, 5))
+
+power_plot / (sign_plot + magnitude_plot)
+
 ```
 
 
